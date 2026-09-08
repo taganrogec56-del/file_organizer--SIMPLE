@@ -53,15 +53,28 @@ def create_category_folder(path_folder: Path, category: str) -> Path | None:
         return None
 
 
+def get_unique_filename(folder: Path, file_path: Path) -> Path:
+    new_path = folder / file_path.name
+    if not new_path.exists():
+        return new_path
+    i = 1
+    while True:
+        new_name = file_path.stem + f'_{i}' + file_path.suffix
+        new_path = folder / new_name
+        if not new_path.exists():
+            return new_path
+        i += 1
+
+
 def main():
     while True:
         path = input('Введите путь к папке: ').strip()
         path_folder = get_folder_path(path)
         if path_folder is not None:
             print('Путь принят')
-            user_answer = input(f' Будет обработана папка: {path_folder}\n'
+            user_answer = input(f'Будет обработана папка: {path_folder}\n'
                                 f'Файлы будут распределены по подпапкам категорий.\n'
-                                f'Начать сортировку? (y/n):\n').strip().lower()
+                                f'Начать сортировку? (y/n): ').strip().lower()
             if user_answer == 'y':
                 try:
                     files_from_folder = path_folder.iterdir()
@@ -71,6 +84,7 @@ def main():
 
                             new_folder = create_category_folder(path_folder, category)
                             if new_folder is not None:
+                                unique_filename_path = get_unique_filename(new_folder, file_path)
                                 print('TODO: Переместить файлы в новую папку')
 
                 except OSError as error:
